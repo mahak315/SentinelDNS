@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
-import json
+from typing import Iterator
 
 import pandas as pd
 
-
-DEFAULT_CHUNK_SIZE = 50_000
 
 LABEL_MAP = {
     "benign_umbrella": "BENIGN",
@@ -19,9 +17,7 @@ LABEL_MAP = {
 def find_json_files(
     dataset_path: str | Path,
 ) -> list[Path]:
-    """
-    Find JSON dataset files recursively.
-    """
+    """Find JSON dataset files recursively."""
 
     root = Path(dataset_path)
 
@@ -30,18 +26,11 @@ def find_json_files(
             f"Dataset path does not exist: {root}"
         )
 
-    return sorted(
-        path
-        for path in root.rglob("*.json")
-        if path.name != "schema.json"
-        and path.name != "data_schema.json"
-    )
+    return sorted(root.rglob("*.json"))
 
 
 def infer_label(path: str | Path) -> str:
-    """
-    Infer the dataset label from the source filename.
-    """
+    """Infer the dataset label from the filename."""
 
     name = Path(path).stem.lower()
 
@@ -54,19 +43,33 @@ def infer_label(path: str | Path) -> str:
     )
 
 
+def stream_json(
+    path: str | Path,
+) -> Iterator[dict]:
+    """
+    Stream records from a JSON array without loading
+    the complete file into memory.
+    """
+
+    import ijson
+
+    with Path(path).open("rb") as file:
+        yield from ijson.items(file, "item")
+
+
 def inspect_dataset(
     dataset_path: str | Path,
-    sample_size: int = 1,
+    sample_size: int = 2,
 ) -> None:
     """
-    Inspect dataset files without loading the complete dataset.
+    Inspect dataset structure without loading complete files.
     """
 
     files = find_json_files(dataset_path)
 
     if not files:
         raise FileNotFoundError(
-            f"No JSON dataset files found under {dataset_path}"
+            f"No JSON files found under {dataset_path}"
         )
 
     print(
@@ -80,76 +83,68 @@ def inspect_dataset(
         print(
             f"SIZE: {path.stat().st_size:,} bytes"
         )
+
+        try:
+            label = infer_label(path)
+        except ValueError:
+            label = "UNKNOWN"
+
+        print(f"LABEL: {label}")
+
+        records = stream_json(path)
+
+        samples = []
+
+        for index, record in enumerate(records):
+
+            samples.append(record)
+
+            if index + 1 >= sample_size:
+                break
+
         print(
-            f"LABEL: {infer_label(path)}"
+            f"SAMPLE RECORDS READ: {len(samples)}"
         )
 
-        with path.open(
-            "r",
-            encoding="utf-8",
-        ) as file:
+        for index, record in enumerate(samples):
 
-            data = json.load(file)
-
-        if not isinstance(data, list):
             print(
-                "WARNING: expected JSON array"
+                f"\nRECORD {index + 1} FIELDS:"
             )
-            continue
 
-        print(
-            f"RECORDS: {len(data):,}"
-        )
+            if isinstance(record, dict):
 
-        if data:
-            record = data[0]
+                for field in record.keys():
+                    print(f"  - {field}")
 
-            print("\nTOP-LEVEL FIELDS:")
-
-            for field in record:
-                print(f"  - {field}")
-
-            print("\nSAMPLE DOMAIN:")
-
-            print(
-                record.get(
-                    "domain_name",
-                    "<missing>",
+                domain = (
+                    record.get("domain_name")
+                    or record.get("domain")
+                    or record.get("fqdn")
                 )
-            )
 
+                print(
+                    f"DOMAIN: {domain}"
+                )
 
-def stream_json(
-    path: str | Path,
-):
-    """
-    Stream JSON-array records.
+            else:
 
-    This intentionally uses JSON decoding incrementally
-    rather than loading the entire multi-gigabyte file.
-    """
-
-    import ijson
-
-    with Path(path).open(
-        "rb"
-    ) as file:
-
-        for record in ijson.items(
-            file,
-            "item",
-        ):
-            yield record
+                print(
+                    f"WARNING: expected object, "
+                    f"got {type(record).__name__}"
+                )
 
 
 def records_to_dataframe(
     path: str | Path,
-    limit: int | None = None,
+    limit: int = 1000,
 ) -> pd.DataFrame:
     """
-    Convert a limited number of records into a DataFrame.
+    Convert a limited number of streamed records
+    into a DataFrame.
 
-    Intended for inspection/testing, not full dataset loading.
+    This function is intentionally limited and should
+    only be used for inspection/testing.
     """
 
     records = []
@@ -160,10 +155,7 @@ def records_to_dataframe(
 
         records.append(record)
 
-        if (
-            limit is not None
-            and index + 1 >= limit
-        ):
+        if index + 1 >= limit:
             break
 
     return pd.DataFrame(records)
