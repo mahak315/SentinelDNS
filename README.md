@@ -1,5 +1,4 @@
 # SentinelDNS
-# SentinelDNS
 
 AI-powered adaptive network threat detection and response system.
 
