@@ -40,9 +40,18 @@ class SentinelDNSResolver(BaseResolver):
             query_type=query_type,
         )
 
+        try:
+            from backend.ml.intrusion_detector import predict_intrusion
+            prediction = predict_intrusion(event)
+            ml_score = prediction["prediction_score"]
+            event.reason = f"ML detected: {prediction['prediction_label']}" if ml_score > 0.5 else None
+        except Exception as e:
+            print(f"[RESOLVER ERROR] ML prediction failed: {e}")
+            ml_score = 0.0
+
         result = analyze_event(
             event,
-            ml_score=0.0,
+            ml_score=ml_score,
         )
 
         print(

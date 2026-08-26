@@ -16,6 +16,7 @@ threat_intelligence = ThreatIntelligenceService()
 def analyze_event(
     event: TrafficEvent,
     ml_score: float,
+    threat_intel_score: float | None = None,
 ) -> TrafficEvent:
     """
     Analyze a DNS/network event.
@@ -24,15 +25,15 @@ def analyze_event(
     the domain contained in the event.
     """
 
-    threat_intel_score = 0.0
-
-    if event.domain:
-        threat_intel_score = (
-            threat_intelligence.get_score(
-                event.domain,
-                IndicatorType.DOMAIN,
+    if threat_intel_score is None:
+        threat_intel_score = 0.0
+        if event.domain:
+            threat_intel_score = (
+                threat_intelligence.get_score(
+                    event.domain,
+                    IndicatorType.DOMAIN,
+                )
             )
-        )
 
     risk_score = calculate_risk(
         threat_intel_score=threat_intel_score,

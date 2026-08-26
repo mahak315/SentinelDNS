@@ -39,3 +39,6 @@ logs/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+# Large Datasets
+dataset/
+data/merged_intrusion_dataset.csv
