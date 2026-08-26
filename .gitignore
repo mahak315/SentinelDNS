@@ -42,3 +42,5 @@ logs/
 # Large Datasets
 dataset/
 data/merged_intrusion_dataset.csv
+
+data/*.db

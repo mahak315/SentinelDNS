@@ -1,0 +1,85 @@
+{
+  "model": "RandomForestClassifier",
+  "features": [
+    "domain_length",
+    "label_count",
+    "subdomain_count",
+    "digit_count",
+    "digit_ratio",
+    "letter_count",
+    "letter_ratio",
+    "hyphen_count",
+    "underscore_count",
+    "special_character_count",
+    "unique_character_count",
+    "unique_character_ratio",
+    "entropy",
+    "tld_length",
+    "domain_without_tld_length"
+  ],
+  "validation": {
+    "accuracy": 0.7422160765558332,
+    "macro_f1": 0.5240869545301001,
+    "weighted_f1": 0.768949475675254,
+    "roc_auc_macro_ovr": 0.8918993084984232,
+    "classes": [
+      "BENIGN",
+      "DGA",
+      "TUNNELING"
+    ],
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.708169632539866,
+        "recall": 0.7056987897700447,
+        "f1": 0.7069320521619766,
+        "support": 86843
+      },
+      "DGA": {
+        "precision": 0.8586487057899664,
+        "recall": 0.7631229280470292,
+        "f1": 0.8080724817907265,
+        "support": 149014
+      },
+      "TUNNELING": {
+        "precision": 0.02964867180805484,
+        "recall": 0.8317307692307693,
+        "f1": 0.05725632963759722,
+        "support": 624
+      }
+    }
+  },
+  "test": {
+    "accuracy": 0.7415141174132382,
+    "macro_f1": 0.5232207478105646,
+    "weighted_f1": 0.7683288208893269,
+    "roc_auc_macro_ovr": 0.8922217881364617,
+    "classes": [
+      "BENIGN",
+      "DGA",
+      "TUNNELING"
+    ],
+    "per_class": {
+      "BENIGN": {
+        "precision": 0.708333816352318,
+        "recall": 0.7035949518677168,
+        "f1": 0.7059564315712248,
+        "support": 86844
+      },
+      "DGA": {
+        "precision": 0.8575036564587386,
+        "recall": 0.7632958198278003,
+        "f1": 0.8076618558165131,
+        "support": 149013
+      },
+      "TUNNELING": {
+        "precision": 0.029016841147018663,
+        "recall": 0.8173076923076923,
+        "f1": 0.056043956043956046,
+        "support": 624
+      }
+    }
+  },
+  "training_samples": 1891844,
+  "validation_samples": 236481,
+  "test_samples": 236481
+}

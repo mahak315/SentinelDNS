@@ -1,6 +1,6 @@
-import socket
+﻿import socket
 
-from dnslib import DNSRecord, QTYPE, RR
+from dnslib import DNSRecord, QTYPE
 from dnslib.server import BaseResolver, DNSLogger, DNSServer
 
 from backend.core.models import TrafficEvent
@@ -8,6 +8,7 @@ from backend.detection.pipeline import analyze_event
 
 
 UPSTREAM_DNS = ("8.8.8.8", 53)
+
 
 
 class SentinelDNSResolver(BaseResolver):
@@ -40,13 +41,42 @@ class SentinelDNSResolver(BaseResolver):
             query_type=query_type,
         )
 
+        ml_score = 0.0
+
         try:
-            from backend.ml.intrusion_detector import predict_intrusion
+            from backend.ml.intrusion_detector import (
+                predict_intrusion
+            )
+
             prediction = predict_intrusion(event)
+
             ml_score = prediction["prediction_score"]
-            event.reason = f"ML detected: {prediction['prediction_label']}" if ml_score > 0.5 else None
-        except Exception as e:
-            print(f"[RESOLVER ERROR] ML prediction failed: {e}")
+
+            label = prediction["prediction_label"]
+            probabilities = prediction["probabilities"]
+
+            event.reason = (
+                f"ML={label} "
+                f"score={ml_score:.4f}"
+            )
+
+            print(
+                f"[ML] "
+                f"domain={domain} "
+                f"prediction={label} "
+                f"score={ml_score:.4f} "
+                f"BENIGN={probabilities.get('BENIGN', 0.0):.4f} "
+                f"DGA={probabilities.get('DGA', 0.0):.4f} "
+                f"TUNNELING={probabilities.get('TUNNELING', 0.0):.4f}"
+            )
+
+        except Exception as exc:
+
+            print(
+                f"[RESOLVER ERROR] "
+                f"ML prediction failed: {exc}"
+            )
+
             ml_score = 0.0
 
         result = analyze_event(
@@ -64,9 +94,14 @@ class SentinelDNSResolver(BaseResolver):
         )
 
         if result.verdict.value == "BLOCK":
-            return self.block_response(request)
 
-        return self.forward_upstream(request)
+            return self.block_response(
+                request
+            )
+
+        return self.forward_upstream(
+            request
+        )
 
     def block_response(self, request):
 
@@ -96,7 +131,9 @@ class SentinelDNSResolver(BaseResolver):
 
             response, _ = sock.recvfrom(4096)
 
-            return DNSRecord.parse(response)
+            return DNSRecord.parse(
+                response
+            )
 
         finally:
 
@@ -143,5 +180,8 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
 
-        print("\nStopping SentinelDNS...")
+        print(
+            "\nStopping SentinelDNS..."
+        )
+
         server.stop()

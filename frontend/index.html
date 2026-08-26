@@ -1,0 +1,225 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentinelDNS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">S</div>
+            <div>
+                <h1>SentinelDNS</h1>
+                <span>AI Threat Detection</span>
+            </div>
+        </div>
+
+        <nav>
+            <button class="nav-item active" data-section="dashboard">Dashboard</button>
+            <button class="nav-item" data-section="events">DNS Events</button>
+            <button class="nav-item" data-section="threats">Threat Intelligence</button>
+            <button class="nav-item" data-section="ml">ML Detection</button>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="system-card">
+                <div class="status-dot"></div>
+                <div>
+                    <strong>System Online</strong>
+                    <span>SentinelDNS Engine</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">SECURITY OPERATIONS</p>
+                <h2 id="page-title">Dashboard</h2>
+            </div>
+
+            <div class="top-status">
+                <span class="live-dot"></span>
+                <span>LIVE</span>
+            </div>
+        </header>
+
+        <section id="dashboard" class="section active">
+
+            <div class="hero">
+                <div>
+                    <p class="eyebrow">SENTINELDNS PROTECTION</p>
+                    <h3>DNS traffic, intelligently protected.</h3>
+                    <p>
+                        SentinelDNS combines threat intelligence with
+                        machine-learning based domain detection.
+                    </p>
+                </div>
+                <div class="shield">◈</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span>Total DNS Queries</span>
+                    <strong id="total-queries">—</strong>
+                    <small>Live traffic</small>
+                </div>
+
+                <div class="stat-card danger">
+                    <span>Threats Blocked</span>
+                    <strong id="blocked">—</strong>
+                    <small>Detected threats</small>
+                </div>
+
+                <div class="stat-card warning">
+                    <span>ML Detections</span>
+                    <strong id="ml-detections">—</strong>
+                    <small>AI classifications</small>
+                </div>
+
+                <div class="stat-card success">
+                    <span>System Status</span>
+                    <strong id="system-status">ONLINE</strong>
+                    <small id="model-name">Loading model...</small>
+                </div>
+            </div>
+
+            <div class="content-grid">
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">ACTIVITY</p>
+                            <h3>Recent DNS Events</h3>
+                        </div>
+                        <button class="refresh" onclick="loadEvents()">↻</button>
+                    </div>
+
+                    <div class="event-list" id="event-list">
+                        <div class="empty">Loading events...</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <div>
+                            <p class="eyebrow">ENGINE</p>
+                            <h3>Detection Stack</h3>
+                        </div>
+                    </div>
+
+                    <div class="engine-list">
+                        <div class="engine">
+                            <div class="engine-icon">TI</div>
+                            <div>
+                                <strong>Threat Intelligence</strong>
+                                <span>Known malicious indicators</span>
+                            </div>
+                            <b>ACTIVE</b>
+                        </div>
+
+                        <div class="engine">
+                            <div class="engine-icon">ML</div>
+                            <div>
+                                <strong>Random Forest</strong>
+                                <span>BENIGN / DGA / TUNNELING</span>
+                            </div>
+                            <b>ACTIVE</b>
+                        </div>
+
+                        <div class="engine">
+                            <div class="engine-icon">RX</div>
+                            <div>
+                                <strong>Risk Engine</strong>
+                                <span>Threat intelligence + ML</span>
+                            </div>
+                            <b>ACTIVE</b>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="events" class="section">
+            <div class="section-heading">
+                <p class="eyebrow">LIVE MONITORING</p>
+                <h3>DNS Events</h3>
+                <p>Monitor queries processed by the SentinelDNS resolver.</p>
+            </div>
+
+            <div class="panel">
+                <div class="event-list large" id="all-events">
+                    <div class="empty">Loading events...</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="threats" class="section">
+            <div class="section-heading">
+                <p class="eyebrow">INTELLIGENCE</p>
+                <h3>Threat Intelligence</h3>
+                <p>Known malicious domains and indicators detected by SentinelDNS.</p>
+            </div>
+
+            <div class="threat-grid">
+                <div class="threat-card">
+                    <span>THREAT INTELLIGENCE</span>
+                    <strong>ACTIVE</strong>
+                    <p>Known malicious indicators are checked during DNS analysis.</p>
+                </div>
+
+                <div class="threat-card">
+                    <span>ML CLASSIFIER</span>
+                    <strong>ACTIVE</strong>
+                    <p>Domain characteristics are analyzed for DGA and tunneling behavior.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="ml" class="section">
+            <div class="section-heading">
+                <p class="eyebrow">MACHINE LEARNING</p>
+                <h3>ML Detection Engine</h3>
+                <p>Current SentinelDNS domain classification model.</p>
+            </div>
+
+            <div class="ml-grid">
+                <div class="ml-card">
+                    <span>MODEL</span>
+                    <strong id="ml-model">RandomForest</strong>
+                </div>
+
+                <div class="ml-card">
+                    <span>CLASSES</span>
+                    <strong>3</strong>
+                    <p>BENIGN · DGA · TUNNELING</p>
+                </div>
+
+                <div class="ml-card">
+                    <span>FEATURES</span>
+                    <strong>15</strong>
+                    <p>Domain lexical characteristics</p>
+                </div>
+
+                <div class="ml-card">
+                    <span>STATUS</span>
+                    <strong class="online">ONLINE</strong>
+                    <p>Loaded and serving predictions</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
