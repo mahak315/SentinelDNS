@@ -5,7 +5,7 @@ from dnslib.server import BaseResolver, DNSLogger, DNSServer
 
 from backend.core.models import TrafficEvent
 from backend.detection.pipeline import analyze_event
-
+from backend.storage.events import record_event
 
 UPSTREAM_DNS = ("8.8.8.8", 53)
 
@@ -83,6 +83,7 @@ class SentinelDNSResolver(BaseResolver):
             event,
             ml_score=ml_score,
         )
+        record_event(result)
 
         print(
             f"[DETECTION] "
