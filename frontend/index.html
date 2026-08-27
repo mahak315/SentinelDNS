@@ -1,9 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SentinelDNS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -22,6 +25,8 @@
         <nav>
             <button class="nav-item active" data-section="dashboard">Dashboard</button>
             <button class="nav-item" data-section="events">DNS Events</button>
+            <button class="nav-item" data-section="devices">Connected Devices</button>
+            <button class="nav-item" data-section="logs">Log History</button>
             <button class="nav-item" data-section="threats">Threat Intelligence</button>
             <button class="nav-item" data-section="ml">ML Detection</button>
         </nav>
@@ -191,28 +196,105 @@
                 <p>Current SentinelDNS domain classification model.</p>
             </div>
 
-            <div class="ml-grid">
+            <!-- Top Row: General Info -->
+            <div class="ml-top-grid">
                 <div class="ml-card">
                     <span>MODEL</span>
                     <strong id="ml-model">RandomForest</strong>
+                    <small>Detection classifier</small>
                 </div>
-
-                <div class="ml-card">
-                    <span>CLASSES</span>
-                    <strong>3</strong>
-                    <p>BENIGN · DGA · TUNNELING</p>
-                </div>
-
-                <div class="ml-card">
-                    <span>FEATURES</span>
-                    <strong>15</strong>
-                    <p>Domain lexical characteristics</p>
-                </div>
-
                 <div class="ml-card">
                     <span>STATUS</span>
                     <strong class="online">ONLINE</strong>
                     <p>Loaded and serving predictions</p>
+                </div>
+            </div>
+
+            <!-- Classes Section -->
+            <div class="ml-layout-section">
+                <p class="eyebrow">MODEL CLASSES</p>
+                <div class="ml-classes-row">
+                    <div class="class-pill benign">
+                        <span class="indicator-dot"></span>
+                        <div class="class-info">
+                            <strong>BENIGN</strong>
+                            <span>Safe Web Traffic</span>
+                        </div>
+                    </div>
+                    <div class="class-pill dga">
+                        <span class="indicator-dot"></span>
+                        <div class="class-info">
+                            <strong>DGA</strong>
+                            <span>Domain Generation Algorithm</span>
+                        </div>
+                    </div>
+                    <div class="class-pill tunneling">
+                        <span class="indicator-dot"></span>
+                        <div class="class-info">
+                            <strong>TUNNELING</strong>
+                            <span>DNS Tunneling Exfiltration</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="ml-layout-section">
+                <p class="eyebrow">FEATURE STATUS</p>
+                <div class="ml-features-row">
+                    <div class="feature-status-card">
+                        <div class="feature-header">
+                            <span>TOTAL FEATURES</span>
+                            <strong>15</strong>
+                        </div>
+                        <p>Lexical and structural domain features analyzed in real-time.</p>
+                    </div>
+                    <div class="feature-status-card">
+                        <div class="feature-header">
+                            <span>INFERENCE STATE</span>
+                            <strong class="active-text">ACTIVE</strong>
+                        </div>
+                        <p>Feature extraction pipeline is online and processing queries.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="devices" class="section">
+            <div class="section-heading">
+                <p class="eyebrow">MITIGATION</p>
+                <h3>Connected Devices</h3>
+                <p>Network devices active in network traffic database logs.</p>
+            </div>
+            
+            <div class="panel">
+                <div class="event-list large" id="connected-devices-list">
+                    <div class="empty">Loading devices...</div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="logs" class="section">
+            <div class="section-heading">
+                <p class="eyebrow">AUDIT TRAILS</p>
+                <h3>Log History</h3>
+                <p>Historical traffic logs retrieved from SQLite database.</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filter-bar" style="margin-bottom: 20px; display: flex; gap: 12px; align-items: center;">
+                <input type="text" id="log-search" placeholder="Search by Domain or Source IP..." style="flex: 1; background: var(--panel2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: inherit;">
+                <select id="log-verdict-filter" style="background: var(--panel2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 8px; font-family: inherit; cursor: pointer; min-width: 140px;">
+                    <option value="">All Actions</option>
+                    <option value="ALLOW">ALLOW</option>
+                    <option value="BLOCK">BLOCK</option>
+                </select>
+                <button class="refresh" id="btn-reset-filters" style="font-size: 13px;">Clear</button>
+            </div>
+
+            <div class="panel">
+                <div class="event-list large" id="log-history-list">
+                    <div class="empty">Loading logs...</div>
                 </div>
             </div>
         </section>
@@ -222,4 +304,5 @@
 
 <script src="script.js"></script>
 </body>
+
 </html>

@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 import json
 
 from fastapi import FastAPI
@@ -82,30 +82,12 @@ def health():
 
 @app.get("/api/stats")
 def stats():
-    events = read_events()
-
-    total = len(events)
-
-    blocked = sum(
-        1
-        for e in events
-        if str(e.get("verdict", "")).upper() == "BLOCK"
-    )
-
-    ml_detections = sum(
-        1
-        for e in events
-        if (
-            e.get("ml_score", 0) not in (0, None)
-            or e.get("detection") not in (None, "", "THREAT_INTEL")
-            or "ML" in str(e.get("reason", "")).upper()
-        )
-    )
-
+    from backend.storage.events import get_stats as db_get_stats
+    s = db_get_stats()
     return {
-        "total_queries": total,
-        "blocked": blocked,
-        "ml_detections": ml_detections,
+        "total_queries": s["total_queries"],
+        "blocked": s["blocked_queries"],
+        "ml_detections": s["dga_detections"] + s["tunneling_detections"],
         "model": "sentinel_dns_random_forest.joblib",
     }
 
@@ -114,11 +96,9 @@ def stats():
 @app.get("/api/dns/events")
 @app.get("/api/logs")
 def events(limit: int = 100):
-    data = read_events()
-
-    return {
-        "events": data[-limit:]
-    }
+    from backend.storage.events import get_recent_events
+    data = get_recent_events(limit)
+    return data
 
 
 @app.get("/api/threats")
@@ -177,6 +157,5 @@ def ml_info():
 
 @app.get("/api/devices")
 def devices():
-    return {
-        "devices": []
-    }
+    from backend.storage.events import get_connected_devices
+    return get_connected_devices()

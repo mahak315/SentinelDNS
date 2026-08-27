@@ -1,4 +1,4 @@
-﻿const API = "http://127.0.0.1:8000";
+const API = "http://127.0.0.1:8000";
 
 const navItems = document.querySelectorAll(".nav-item");
 const sections = document.querySelectorAll(".section");
@@ -19,6 +19,10 @@ navItems.forEach(button => {
 
         if (target === "events") {
             loadEvents("all-events");
+        } else if (target === "devices") {
+            loadDevices();
+        } else if (target === "logs") {
+            loadLogHistory();
         }
     });
 });
@@ -152,6 +156,20 @@ async function initialize() {
         loadStats(),
         loadEvents()
     ]);
+
+    const logSearch = document.getElementById("log-search");
+    const verdictFilter = document.getElementById("log-verdict-filter");
+    const btnReset = document.getElementById("btn-reset-filters");
+    
+    if (logSearch) logSearch.addEventListener("input", renderFilteredLogs);
+    if (verdictFilter) verdictFilter.addEventListener("change", renderFilteredLogs);
+    if (btnReset) {
+        btnReset.addEventListener("click", () => {
+            logSearch.value = "";
+            verdictFilter.value = "";
+            renderFilteredLogs();
+        });
+    }
 }
 
 initialize();
@@ -159,3 +177,119 @@ initialize();
 setInterval(loadHealth, 10000);
 setInterval(loadStats, 5000);
 setInterval(loadEvents, 5000);
+setInterval(() => {
+    const activeSection = document.querySelector(".section.active");
+    if (activeSection) {
+        if (activeSection.id === "devices") {
+            loadDevices();
+        } else if (activeSection.id === "logs") {
+            loadLogHistory();
+        }
+    }
+}, 5000);
+
+let cachedLogs = [];
+
+async function loadDevices() {
+    const container = document.getElementById("connected-devices-list");
+    if (!container) return;
+    
+    try {
+        const data = await api("/api/devices");
+        const devices = Array.isArray(data) ? data : data.devices || [];
+        
+        if (devices.length === 0) {
+            container.innerHTML = '<div class="empty">No connected devices available.</div>';
+            return;
+        }
+        
+        container.innerHTML = devices.map(device => {
+            const name = device.device_name || "DHCP Device";
+            const ip = device.ip || "—";
+            const status = device.status || "offline";
+            const lastActive = device.last_active ? new Date(device.last_active).toLocaleString() : "—";
+            const statusBadgeClass = status === "online" ? "ALLOW" : status === "idle" ? "MONITOR" : "BLOCK";
+            
+            return `
+                <div class="event">
+                    <div>
+                        <div class="event-domain" style="font-size: 14px; font-weight: bold; color: var(--accent);">${escapeHtml(name)}</div>
+                        <div class="event-meta" style="font-size: 11px; margin-top: 4px; color: var(--muted);">
+                            IP: <strong>${escapeHtml(ip)}</strong> &middot; 
+                            Last Active: ${escapeHtml(lastActive)} &middot; 
+                            Queries: <strong>${device.total_queries}</strong> &middot; 
+                            Threats Blocked: <span style="color: ${device.threats_blocked > 0 ? 'var(--red)' : 'var(--green)'}; font-weight: bold;">${device.threats_blocked}</span>
+                        </div>
+                    </div>
+                    <span class="badge ${statusBadgeClass}">${status.toUpperCase()}</span>
+                </div>
+            `;
+        }).join("");
+    } catch (error) {
+        console.error("Devices error:", error);
+        container.innerHTML = '<div class="empty">Failed to load connected devices.</div>';
+    }
+}
+
+async function loadLogHistory() {
+    const container = document.getElementById("log-history-list");
+    if (!container) return;
+    
+    try {
+        const data = await api("/api/logs");
+        cachedLogs = Array.isArray(data) ? data : data.events || data.items || data.logs || [];
+        renderFilteredLogs();
+    } catch (error) {
+        console.error("Log history error:", error);
+        container.innerHTML = '<div class="empty">Failed to load log history.</div>';
+    }
+}
+
+function renderFilteredLogs() {
+    const container = document.getElementById("log-history-list");
+    if (!container) return;
+    
+    const searchVal = document.getElementById("log-search") ? document.getElementById("log-search").value.toLowerCase().trim() : "";
+    const verdictVal = document.getElementById("log-verdict-filter") ? document.getElementById("log-verdict-filter").value : "";
+    
+    const filtered = cachedLogs.filter(log => {
+        const matchesSearch = !searchVal || 
+            (log.domain && log.domain.toLowerCase().includes(searchVal)) || 
+            (log.source_ip && log.source_ip.toLowerCase().includes(searchVal));
+        const matchesVerdict = !verdictVal || log.verdict === verdictVal;
+        return matchesSearch && matchesVerdict;
+    });
+    
+    if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty">No logs match your filter criteria.</div>';
+        return;
+    }
+    
+    container.innerHTML = filtered.map(log => {
+        const domain = log.domain || "unknown";
+        const queryType = log.query_type || "A";
+        const ip = log.source_ip || "—";
+        const protocol = log.protocol || "UDP";
+        const verdict = log.verdict || "ALLOW";
+        const severity = log.severity || "INFORMATIONAL";
+        const reason = log.reason || "Normal traffic";
+        const time = log.timestamp ? new Date(log.timestamp).toLocaleString() : "—";
+        
+        return `
+            <div class="event">
+                <div>
+                    <div class="event-domain">${escapeHtml(domain)} (${escapeHtml(queryType)})</div>
+                    <div class="event-meta">
+                        Time: ${escapeHtml(time)} &middot; 
+                        Source: <strong>${escapeHtml(ip)}</strong> &middot; 
+                        Protocol: <strong>${escapeHtml(protocol)}</strong> &middot; 
+                        Risk Score: <strong>${((log.risk_score || 0) * 100).toFixed(1)}%</strong> &middot; 
+                        Severity: <span style="font-weight: bold; color: ${severity === 'CRITICAL' || severity === 'HIGH' ? 'var(--red)' : severity === 'MEDIUM' ? 'var(--yellow)' : 'var(--muted)'}">${escapeHtml(severity)}</span> &middot; 
+                        Details: ${escapeHtml(reason)}
+                    </div>
+                </div>
+                <span class="badge ${verdict}">${escapeHtml(verdict)}</span>
+            </div>
+        `;
+    }).join("");
+}
