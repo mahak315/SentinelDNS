@@ -1,0 +1,351 @@
+/* ================================================================
+   SentinelDNS — Landing
+   Palette: deep navy · purple · violet · magenta · cool blue
+   Fonts  : DM Serif Display (headline strong) · Space Grotesk (UI)
+   ================================================================ */
+
+:root {
+  --bg:         #06050F;
+  --purple:     #7C3AED;
+  --violet:     #8B5CF6;
+  --magenta:    #C026D3;
+  --blue:       #3B82F6;
+  --text:       #EDE9FE;      /* lavender-tinted off-white */
+  --text-dim:   #8875A0;      /* muted purple-gray */
+  --text-faint: #52486A;      /* dim tertiary */
+  --border-p:   rgba(124, 58, 237, 0.28);
+  --ease:       cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-ui:    'Space Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Atmospheric glow — matches robot's purple/magenta tones */
+body {
+  background:
+    radial-gradient(ellipse 70% 60% at 72% 44%, rgba(124, 58, 237, 0.055) 0%, transparent 65%),
+    radial-gradient(ellipse 44% 38% at 64% 60%, rgba(192, 38, 211, 0.032) 0%, transparent 58%),
+    var(--bg);
+}
+
+/* ── Page shell ─────────────────────────────────────── */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0 clamp(20px, 5vw, 64px);
+}
+
+/* ── Top bar ────────────────────────────────────────── */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0 0;
+}
+
+.logo {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--text);
+  user-select: none;
+}
+
+.logo-dns {
+  color: var(--violet);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  color: var(--text-dim);
+}
+
+/* ── Dot indicators ─────────────────────────────────── */
+
+.dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.55);
+  flex-shrink: 0;
+}
+
+.dot--sm {
+  width: 4px;
+  height: 4px;
+}
+
+.dot--pulse {
+  animation: dot-pulse 2.6s ease-in-out infinite;
+}
+
+/* ── Layout grid ────────────────────────────────────── */
+
+.layout {
+  flex: 1;
+  display: grid;
+  /* Narrow text column; robot dominates remaining space */
+  grid-template-columns: minmax(280px, 400px) 1fr;
+  align-items: center;
+  gap: clamp(16px, 3vw, 44px);
+  min-height: 0;
+}
+
+/* ── Hero copy ──────────────────────────────────────── */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 52px;
+  padding-top: 12px;
+}
+
+.eyebrow {
+  margin: 0 0 20px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+/* ── Headline: weight + typeface contrast ───────────── */
+
+.headline {
+  margin: 0 0 22px;
+  line-height: 1.05;
+}
+
+/* "See the threat." — DM Serif Display; editorial weight at display size */
+.hl-strong {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: clamp(2.1rem, 3.8vw, 3.75rem);
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -0.015em;
+}
+
+/* "Before it strikes." — Space Grotesk thin; elegant contrast */
+.hl-light {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: clamp(1.25rem, 2.15vw, 1.9rem);
+  font-weight: 300;
+  color: rgba(237, 233, 254, 0.38);
+  letter-spacing: -0.022em;
+  margin-top: 0.2rem;
+}
+
+.divider {
+  width: 64px;
+  height: 3px;
+  margin: 0 0 22px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--purple), var(--magenta));
+  box-shadow: 0 0 12px rgba(192, 38, 211, 0.35);
+}
+
+.sub {
+  margin: 0 0 34px;
+  max-width: 36ch;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.78;
+  color: var(--text-dim);
+  letter-spacing: 0.012em;
+}
+
+/* ── CTA group ──────────────────────────────────────── */
+
+.cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+/* ── CTA button ─────────────────────────────────────── */
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 22px;
+  border: 1px solid var(--border-p);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  background: rgba(124, 58, 237, 0.07);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 0.38s var(--ease),
+    background   0.38s var(--ease),
+    box-shadow   0.38s var(--ease);
+}
+
+/* Hover gradient fill — purple → magenta */
+.cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(130deg, rgba(124, 58, 237, 0.18), rgba(192, 38, 211, 0.1));
+  opacity: 0;
+  transition: opacity 0.38s var(--ease);
+  pointer-events: none;
+}
+
+.cta:hover {
+  border-color: rgba(139, 92, 246, 0.65);
+  background: rgba(124, 58, 237, 0.12);
+  box-shadow:
+    0 0 24px rgba(124, 58, 237, 0.22),
+    0 0 56px rgba(124, 58, 237, 0.08);
+}
+
+.cta:hover::before { opacity: 1; }
+
+.cta-arrow {
+  position: relative;
+  transition: transform 0.38s var(--ease);
+}
+
+.cta:hover .cta-arrow { transform: translateX(5px); }
+
+.cta:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 3px;
+}
+
+/* ── Read-only indicator ────────────────────────────── */
+
+.indicator {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ── 3D torus scene ─────────────────────────────────── */
+
+.scene {
+  position: relative;
+  height: min(80vh, 700px);
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* ── Keyframes ──────────────────────────────────────── */
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1;    box-shadow: 0 0 6px rgba(139, 92, 246, 0.6); }
+  50%       { opacity: 0.3; box-shadow: 0 0 2px rgba(139, 92, 246, 0.15); }
+}
+
+/* ── Responsive — tablet / mobile ───────────────────── */
+
+@media (max-width: 980px) {
+  html, body { overflow: auto; }
+
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding-top: 8px;
+  }
+
+  .hero {
+    order: 1;
+    align-items: center;
+    text-align: center;
+    padding-bottom: 4px;
+  }
+
+  .sub { max-width: 44ch; }
+
+  .divider { margin-left: auto; margin-right: auto; }
+
+  .cta-wrap { align-items: center; }
+
+  .scene {
+    order: 2;
+    height: min(60vh, 480px);
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar { padding-top: 20px; }
+
+  /* Hide status text on very small screens */
+  .status { display: none; }
+
+  .hl-strong { font-size: 2rem; }
+  .hl-light  { font-size: 1.2rem; }
+}
+
+/* ── Short-screen safety ────────────────────────────── */
+
+@media (max-height: 660px) {
+  .topbar  { padding-top: 16px; }
+  .hero    { padding-bottom: 28px; }
+  .headline { margin-bottom: 14px; }
+  .sub      { margin-bottom: 22px; }
+}
+
+/* ── Reduced motion ─────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .dot--pulse { animation: none !important; }
+
+  .cta,
+  .cta::before,
+  .cta-arrow {
+    transition: none !important;
+  }
+}

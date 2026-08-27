@@ -44,3 +44,6 @@ dataset/
 data/merged_intrusion_dataset.csv
 
 data/*.db
+
+# Landing page dependencies
+frontend/SentinelDNS_Landing_Page_updated/node_modules/
