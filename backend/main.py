@@ -22,6 +22,21 @@ app.add_middleware(
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 EVENT_LOG = PROJECT_ROOT / "data" / "dns_events.jsonl"
+FRONTEND_DIR = PROJECT_ROOT / "frontend"
+
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+if FRONTEND_DIR.exists():
+    app.mount("/frontend", StaticFiles(directory=FRONTEND_DIR), name="frontend")
+
+
+@app.get("/dashboard")
+def dashboard():
+    index_path = FRONTEND_DIR / "index.html"
+    if index_path.exists():
+        return FileResponse(index_path)
+    return {"error": "Dashboard UI not found"}
 
 
 def read_events():

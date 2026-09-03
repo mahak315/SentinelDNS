@@ -1,0 +1,18 @@
+[Unit]
+Description=SentinelDNS Threat Detection System
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/sentineldns
+ExecStart=/opt/sentineldns/start.sh
+Restart=always
+RestartSec=5
+Environment=SENTINEL_DNS_HOST=0.0.0.0
+Environment=SENTINEL_DNS_PORT=5300
+Environment=FASTAPI_HOST=0.0.0.0
+Environment=FASTAPI_PORT=8000
+
+[Install]
+WantedBy=multi-user.target

@@ -28,7 +28,7 @@ def test_prediction_flow():
     assert isinstance(res['prediction_score'], float)
     assert 0.0 <= res['prediction_score'] <= 1.0
     assert "probabilities" in res
-    assert "Normal Traffic" in res["probabilities"]
+    assert "BENIGN" in res["probabilities"] or "Normal Traffic" in res["probabilities"]
 
 if __name__ == "__main__":
     test_prediction_flow()

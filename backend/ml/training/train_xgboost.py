@@ -15,7 +15,7 @@ def main():
     if "training" in project_root.parts or "ml" in project_root.parts:
         project_root = Path(__file__).resolve().parents[3]
     else:
-        project_root = Path(r"C:\Users\SINCHANA\Documents\GitHub\SentinelDNS")
+        project_root = Path(__file__).resolve().parents[3]
         
     dataset_dir = project_root / "dataset"
     csv_path = dataset_dir / "merged_intrusion.csv"

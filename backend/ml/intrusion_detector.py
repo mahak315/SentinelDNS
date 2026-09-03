@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from pathlib import Path
 
@@ -25,10 +25,18 @@ def _get_artifact():
         )
 
         if not model_path.exists():
-            raise FileNotFoundError(
-                f"SentinelDNS Random Forest model not found at "
-                f"{model_path}"
-            )
+            alt_paths = [
+                project_root / "models" / "intrusion_xgboost.joblib",
+                project_root / "models" / "sentinel_dns_xgboost.joblib",
+            ]
+            for alt in alt_paths:
+                if alt.exists():
+                    model_path = alt
+                    break
+            else:
+                raise FileNotFoundError(
+                    f"SentinelDNS model not found at {model_path}"
+                )
 
         _model_artifact = joblib.load(model_path)
 
@@ -90,7 +98,7 @@ def predict_intrusion(event: TrafficEvent) -> dict:
 
     model = artifact["model"]
     label_encoder = artifact["label_encoder"]
-    feature_names = artifact["feature_columns"]
+    feature_names = artifact.get("feature_columns") or artifact.get("feature_names", [])
 
     df_features = event_to_dns_features(
         event,

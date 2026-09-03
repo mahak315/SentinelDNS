@@ -1,4 +1,6 @@
-const API = "http://127.0.0.1:8000";
+const API = (window.location.port === "8000" || !window.location.port) && window.location.protocol.startsWith("http")
+    ? window.location.origin
+    : `${window.location.protocol.startsWith("http") ? window.location.protocol : "http:"}//${window.location.hostname || "127.0.0.1"}:8000`;
 
 const navItems = document.querySelectorAll(".nav-item");
 const sections = document.querySelectorAll(".section");
