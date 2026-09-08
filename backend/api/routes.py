@@ -18,7 +18,7 @@ def health():
         "status": "online",
         "service": "SentinelDNS",
         "ml": "RandomForest",
-        "model": "sentinel_dns_random_forest.joblib",
+        "model": "dns_exfiltration_xgboost.json",
     }
 
 

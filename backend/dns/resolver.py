@@ -66,8 +66,7 @@ class SentinelDNSResolver(BaseResolver):
                 f"prediction={label} "
                 f"score={ml_score:.4f} "
                 f"BENIGN={probabilities.get('BENIGN', 0.0):.4f} "
-                f"DGA={probabilities.get('DGA', 0.0):.4f} "
-                f"TUNNELING={probabilities.get('TUNNELING', 0.0):.4f}"
+                f"MALICIOUS={probabilities.get('MALICIOUS', 0.0):.4f}"
             )
 
         except Exception as exc:

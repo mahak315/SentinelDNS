@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import xgboost as xgb
 
 import joblib
 import pandas as pd
@@ -13,35 +14,29 @@ _model_artifact = None
 
 
 def _get_artifact():
-    """Load the trained SentinelDNS Random Forest artifact lazily."""
+    """Load the trained DNS XGBoost model lazily."""
     global _model_artifact
 
     if _model_artifact is None:
         project_root = Path(__file__).resolve().parents[2]
-        model_path = (
-            project_root
-            / "models"
-            / "sentinel_dns_random_forest.joblib"
-        )
+        model_path = project_root / "models" / "dns_exfiltration_xgboost.json"
 
         if not model_path.exists():
-            alt_paths = [
-                project_root / "models" / "intrusion_xgboost.joblib",
-                project_root / "models" / "sentinel_dns_xgboost.joblib",
-            ]
-            for alt in alt_paths:
-                if alt.exists():
-                    model_path = alt
-                    break
-            else:
-                raise FileNotFoundError(
-                    f"SentinelDNS model not found at {model_path}"
-                )
+            raise FileNotFoundError(
+                f"DNS XGBoost model not found at {model_path}"
+            )
 
-        _model_artifact = joblib.load(model_path)
+        model = xgb.XGBClassifier()
+        model.load_model(model_path)
+
+        feature_names = model.get_booster().feature_names
+
+        _model_artifact = {
+            "model": model,
+            "feature_names": feature_names,
+        }
 
     return _model_artifact
-
 
 def event_to_dns_features(
     event: TrafficEvent,
@@ -97,7 +92,6 @@ def predict_intrusion(event: TrafficEvent) -> dict:
     artifact = _get_artifact()
 
     model = artifact["model"]
-    label_encoder = artifact["label_encoder"]
     feature_names = artifact.get("feature_columns") or artifact.get("feature_names", [])
 
     df_features = event_to_dns_features(
@@ -109,19 +103,15 @@ def predict_intrusion(event: TrafficEvent) -> dict:
         model.predict(df_features)[0]
     )
 
-    pred_label = str(
-        label_encoder.inverse_transform(
-            [pred_encoded]
-        )[0]
-    )
+    pred_label = "MALICIOUS" if pred_encoded == 1 else "BENIGN"
 
     pred_proba = model.predict_proba(
         df_features
     )[0]
 
     probabilities = {
-        str(label_encoder.classes_[i]): float(probability)
-        for i, probability in enumerate(pred_proba)
+        "BENIGN": float(pred_proba[0]),
+        "MALICIOUS": float(pred_proba[1]),
     }
 
     benign_probability = probabilities.get(

@@ -75,13 +75,13 @@ def root():
 @app.get("/health")
 @app.get("/api/health")
 def health():
-    model_name = "sentinel_dns_random_forest.joblib"
+    model_name = "dns_exfiltration_xgboost.json"
 
     try:
         artifact = _get_artifact()
         model_type = artifact.get(
             "model_type",
-            "RandomForestClassifier",
+            "XGBClassifier",
         )
         ml_status = model_type
     except Exception:
@@ -103,7 +103,7 @@ def stats():
         "total_queries": s["total_queries"],
         "blocked": s["blocked_queries"],
         "ml_detections": s["dga_detections"] + s["tunneling_detections"],
-        "model": "sentinel_dns_random_forest.joblib",
+        "model": "dns_exfiltration_xgboost.json",
     }
 
 
@@ -143,8 +143,8 @@ def ml_info():
 
         return {
             "status": "online",
-            "model": "RandomForestClassifier",
-            "model_file": "sentinel_dns_random_forest.joblib",
+            "model": "XGBClassifier",
+            "model_file": "dns_exfiltration_xgboost.json",
             "classes": list(
                 artifact["label_encoder"].classes_
             ),
@@ -165,7 +165,7 @@ def ml_info():
     except Exception as exc:
         return {
             "status": "offline",
-            "model": "RandomForestClassifier",
+            "model": "XGBClassifier",
             "error": str(exc),
         }
 
