@@ -102,7 +102,7 @@ def stats():
     return {
         "total_queries": s["total_queries"],
         "blocked": s["blocked_queries"],
-        "ml_detections": s["dga_detections"] + s["tunneling_detections"],
+        "ml_detections": s["ml_detections"],
         "model": "dns_exfiltration_xgboost.json",
     }
 

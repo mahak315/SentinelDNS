@@ -44,7 +44,7 @@ def event_to_dns_features(
 ) -> pd.DataFrame:
     """
     Convert a SentinelDNS TrafficEvent into the exact
-    feature schema used by the trained DNS Random Forest.
+    feature schema used by the trained DNS XGBoost.
     """
 
     features = extract_traffic_features(event)
@@ -77,7 +77,7 @@ def predict_intrusion(event: TrafficEvent) -> dict:
 
     Returns:
       prediction_label:
-          BENIGN, DGA, or TUNNELING
+          BENIGN or MALICIOUS
 
       prediction_score:
           probability of the event being malicious

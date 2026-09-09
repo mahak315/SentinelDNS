@@ -162,19 +162,11 @@ def get_stats():
             """
         ).fetchone()[0]
 
-        dga = connection.execute(
+        ml_detections = connection.execute(
             """
             SELECT COUNT(*)
             FROM dns_events
-            WHERE reason LIKE '%DGA%'
-            """
-        ).fetchone()[0]
-
-        tunneling = connection.execute(
-            """
-            SELECT COUNT(*)
-            FROM dns_events
-            WHERE reason LIKE '%TUNNELING%'
+            WHERE ml_score > 0
             """
         ).fetchone()[0]
 
@@ -192,8 +184,7 @@ def get_stats():
         "total_queries": total,
         "blocked_queries": blocked,
         "alerts": alerts,
-        "dga_detections": dga,
-        "tunneling_detections": tunneling,
+        "ml_detections": ml_detections,
         "threat_intel_hits": threat_intel,
     }
 
